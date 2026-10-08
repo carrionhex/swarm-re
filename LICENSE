@@ -1,0 +1,38 @@
+Business Source License 1.1
+
+License text copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
+Licensed work copyright (c) 2026 CarrionHex, All Rights Reserved.
+
+------------------------------------------------------------------------------
+
+Parameters
+
+Licensor:             CarrionHex
+Licensed Work:        CarrionHex SWARM-RE
+                      The Licensor's repository at
+                      https://github.com/carrionhex/swarm-re
+Change Date:          2030-10-08
+Change License:       Apache License, Version 2.0
+------------------------------------------------------------------------------
+
+Terms
+
+The Licensor hereby grants you the right to copy, modify, create derivative
+works, redistribute, and make non-production or production use of the Licensed
+Work, provided that in each instance you prominently display this license text
+and preserve the Licensor's copyright notices.
+
+Additional Use Grant: You may use the Licensed Work for any purpose, commercial
+or non-commercial, except that you may not use it, or any work derived from
+it, to offer a competing hosted or managed reverse-engineering service, or to
+sell licenses, keys, or access to the Licensed Work or its derivatives.
+
+Alternative Licensing: Commercial licenses for terms outside this license are
+available from the Licensor at carrionhex@gmail.com.
+
+Change Date: On the Change Date above, this license will convert to the Change
+License and the Additional Use Grant will cease to apply.
+
+THE LICENSED WORK IS PROVIDED "AS IS". THE LICENSOR MAKES NO WARRANTIES,
+EXPRESS OR IMPLIED, AND DISCLAIMS ALL LIABILITY FOR YOUR USE OF THE LICENSED
+WORK TO THE MAXIMUM EXTENT PERMITTED BY LAW.
