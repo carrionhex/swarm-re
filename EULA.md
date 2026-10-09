@@ -1,6 +1,6 @@
 # CarrionHex SWARM-RE — End User License Agreement
 
-**Version 1.0 — Effective date: [GO-PUBLIC DATE]**
+**Version 1.0 — Effective date: October 9, 2026**
 
 This agreement is between you and CarrionHex ("Licensor"). By downloading, installing, or using SWARM-RE ("the Software"), you accept these terms.
 
