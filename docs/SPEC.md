@@ -1,70 +1,84 @@
-# SWARM-RE — Product Specification (doctrine level)
+# SWARM-RE — Product Specification v2 (doctrine level)
 
-This document defines what SWARM-RE is for, how its agents behave, and what each
-tier owes the user. It is the contract the implementation is tested against.
-No internals, no mechanics — the spec of behavior.
+Behavior contract the implementation is tested against. No internals.
 
 ## 1. Prime directive: truth on screen
 
 Every number, progress bar, and report shown to the user is produced by a real
-agent run against a real input. No simulated data in the shipped product. The
-panel is a window into the campaign, never a decoration.
+agent run against a real input. No simulated data in the shipped product.
+Marketing captures come from real runs only.
 
-Corollary: marketing captures (screenshots, clips) are captured from real runs.
+## 2. The roster — 10 named agents
 
-## 2. The specialist roster
+| Agent | Seat | Job |
+|---|---|---|
+| Joe | Intake | File identity: hashes, type, arch, platform verdict. Rejects garbage early. |
+| Mike | Windows dept | PE / DLL / .NET targets. |
+| Rachid | Apple dept | Mach-O, FAT binaries, iOS IPA. |
+| Hamza | Linux/Unix dept | ELF and the *nix format zoo. |
+| Greg | Cross-format dept | Firmware, blobs, scripts, packed/VM-protected anything. |
+| Josh | Crypto & strings | Algorithm identification, key material hunting, strings census. |
+| Jesse | Dynamic lab | Tracing, behavioral analysis, sandbox runs (lab only). |
+| (name TBD) | Tech Master | The boss agent. Takes the client order, routes by platform, assigns the work order, runs recap + judgement, delivers the verdict. |
+| (name TBD) | Quartermaster | Evidence vault: extracted parts organized with provenance, immutable bundles. |
+| (name TBD) | Reporter/Verifier | Final reports; scores every agent claim against evidence or ground truth before it reaches the client. |
 
-Agents are specialists with one job each. The controller routes work between
-them and owns the gate logic.
+Department heads receive work from the Tech Master and may spawn specialists
+under their department for a mission.
 
-| Role | Job |
-|---|---|
-| CONTROLLER | Owns the mission. Splits targets, routes parts, decides gates, assembles the final report. |
-| INGEST | Intake: identify file type, hash, size, arch, entropy profile. Rejects garbage early. |
-| MAP | Structural survey: sections, imports, exports, strings census, compiler/packer/protector fingerprint, capability hints. Produces the Community report. |
-| DISSECT (per domain) | Deep work on assigned parts: disassembly reading, decompilation, crypto identification, unpacking, tracing. |
-| QUARTERMASTER | Organizes extracted parts (functions, structs, constants, keys) into the shared evidence store with provenance. |
-| REPORTER | Assembles human-readable reports per gate: what was found, what it means, what the next wall is, what gear opens it. |
-| VERIFIER | Checks every agent claim against ground truth or corroborating evidence before it reaches the user. Nothing unverified ships. |
+## 3. The engine mesh (differentiator)
 
-## 3. Tier behavior
+Three decompilers analyze every target, headless, simultaneously:
 
-### Community — "the map, free"
+- Ghidra (headless batch) — free, baseline engine
+- Binary Ninja (headless API) — commercial, licensed by the user
+- IDA (headless idat + IDAPython) — commercial, licensed by the user
 
-Input: any binary or file.
-Output: the full recon report —
+All findings flow into one normalized evidence schema (functions, xrefs,
+strings, decompilation, disassembly opinions). Agents then run
+cross-engine corroboration: where engines disagree on semantics, an agent
+adjudicates from quoted evidence. A claim accepted by the mesh carries
+engine-attributed consensus; a disputed claim is flagged, never silently
+resolved. Without this mesh SWARM-RE is a wrapper. With it, it is its own species.
 
-- file identity (hashes, type, arch, size, entropy)
-- compiler + toolchain fingerprint
-- packer/protector identification (or "none / not detected")
-- imports/exports census and what they imply
-- strings summary (interesting clusters surfaced, full census available)
-- capabilities observed (crypto, network, persistence, anti-debug hints)
-- difficulty assessment: what the user is up against, gate by gate
-- verdict: what a deep campaign would target first, and why
+## 4. Timing and resources
 
-The report ends with the question: **want to dive deeper?**
-Deep dives run on Pro gears. The map is the product; the map is the funnel.
+- Every agent run has a wall-clock budget and a resource envelope (CPU quota,
+  memory cap) enforced by the runtime.
+- Overrun policy: escalate once, then terminate with partial findings stamped
+  INCOMPLETE. An agent is never silently late and never runaway.
+- Mission-level budget: the Tech Master tracks cumulative spend and reports it
+  in the verdict (time per agent, tokens/compute consumed).
 
-### Pro — "every gate, solved"
+## 5. Work-order pipeline (state machine)
 
-- full dissection campaigns across all gates (unpack, devirtualize, anti-anti,
-  key recovery, protocol reversing)
-- all tools and tweaks enabled, every adapter wired
-- per-gate agent reports: finding → meaning → solution
-- final evidence bundle: sha256-stamped, replayable, auditable
+ORDER → INTAKE (Joe: identify platform/format)
+     → ROUTE (Tech Master → department)
+     → ASSIGN (per-agent work order with budgets)
+     → EXECUTE (time-boxed, evidence-quoted, cross-mesh where applicable)
+     → RECAP (Tech Master assembles per-agent findings)
+     → JUDGE (Reporter/Verifier scores against evidence; UNKNOWN is a legal verdict, a guess is not)
+     → VERDICT (final client report: findings, confidence, what you're up against, what a deeper campaign would target)
 
-## 4. Testing bar
+Every transition is logged to the mission evidence bundle.
 
-- every shipped agent claim passes VERIFIER against ground truth on a known
-  corpus (crackmes, packed samples, self-built binaries with planted answers)
-- accuracy is measured, not asserted: corpus item → expected finding → actual
-  finding → pass/fail recorded
-- a release candidate must clear the corpus with zero false "solved" claims
-  and zero missed protectors/packers
+## 6. Tiers
 
-## 5. Integrity rules
+Community — the full map (Joe + one department + Reporter): identity, compiler
+fingerprint, packer/protector verdict, imports, strings, capabilities,
+difficulty, what you're up against. Ends with: "want to dive deeper?"
 
-- authorized targets only: your software, your binaries, your scope
-- evidence bundles are immutable once stamped
-- an agent that cannot verify a claim must say "unknown", never guess
+Pro — the full mesh: every gate worked by the complete roster, per-gate
+solutions, engine-consensus evidence bundles.
+
+## 7. Testing bar
+
+- Every shipped claim passes the Verifier against ground truth on a known
+  corpus. Accuracy is measured claim-by-claim, not asserted.
+- Release candidate: zero false "solved", zero missed protectors/packers.
+
+## 8. Integrity rules
+
+- Authorized targets only: your software, your binaries, your scope.
+- Evidence bundles are immutable once stamped.
+- UNKNOWN is legal; confabulation is a bug.
