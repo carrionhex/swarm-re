@@ -6,6 +6,8 @@ SWARM-RE turns a queue of reverse-engineering missions into coordinated multi-ag
 
 Manual RE doesn't scale. Campaigns do.
 
+![SWARM-RE mission room — live panel](docs/mission-room.png)
+
 ---
 
 ## What it does
