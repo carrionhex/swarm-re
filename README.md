@@ -95,6 +95,10 @@ SWARM-RE is built for **authorized testing**: your software, your binaries, your
 
 Business Source License 1.1 — free to use, modify, and redistribute; competing hosted/managed offerings are not permitted. Converts to Apache-2.0 on the change date. The SWARM-RE name and marks are trademarks of the project. See [LICENSE](LICENSE).
 
+## Specification
+
+Behavior contract the implementation is tested against: [docs/SPEC.md](docs/SPEC.md).
+
 ## Status
 
 Actively developed. Roadmap and issue tracker are the source of truth. Contributions welcome — see [CONTRIBUTING](CONTRIBUTING.md).
