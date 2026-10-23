@@ -6,6 +6,8 @@ SWARM-RE turns a queue of reverse-engineering missions into coordinated multi-ag
 
 Manual RE doesn't scale. Campaigns do.
 
+**▶ Try it live: https://dash.carrionhex.com** — drop a specimen, watch the swarm work, read the verdict. No install, no account.
+
 ---
 
 ## 🌐 Try it live — no install
@@ -83,7 +85,7 @@ of truth for what's next.
 
 ## Watch it work
 
-Real runs against the live console — no staging.
+Real runs against the live console — no staging. Try your own specimen at **https://dash.carrionhex.com** any time.
 
 **Console storyboard** — stage a specimen, deploy the swarm, ten specialists check in live, plain-English verdict lands:
 
