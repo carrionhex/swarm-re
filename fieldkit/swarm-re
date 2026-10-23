@@ -28,7 +28,7 @@ def _activation():
             key = p.read_text().strip()
     if not key:
         print("[license] no key — EVALUATION MODE (3-agent cap, watermarked)")
-        print("[license] free key for students/researchers: https://carrionhex.com")
+        print("[license] free key for students/researchers: https://dash.carrionhex.com")
         return {"eval": True}
     try:
         st = lk.require_active(key)

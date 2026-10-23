@@ -58,8 +58,8 @@ Everything runs on your hardware. One ordinary server with a GPU (or even withou
 ## Quickstart
 
 ```bash
-# 1. Clone
-git clone https://github.com/carrionhex/swarm-re && cd swarm-re
+# 1. Clone (the open Field Kit lives in fieldkit/)
+git clone https://github.com/carrionhex/swarm-re && cd swarm-re/fieldkit
 
 # 2. Install (dep check + smoke build — stdlib only, nothing phones home)
 ./install.sh

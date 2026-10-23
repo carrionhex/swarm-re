@@ -1,0 +1,96 @@
+{
+  "verifier": "v0.8",
+  "target": "/tmp/swarmre_audit/fieldkit/bench/toy_protector/belt1",
+  "checks": 14,
+  "pass": 6,
+  "fail": 6,
+  "unverifiable": 2,
+  "score": "6/12",
+  "verdict": "FAIL",
+  "results": [
+    {
+      "item": "sha256",
+      "claim": "75678056eafbb58e8ae3264f0a2778a6bfa08835488257a6142f9e655b98fba4",
+      "verdict": "PASS",
+      "detail": "real=75678056eafbb58e8ae3264f0a2778a6bfa08835488257a6142f9e655b98fba4"
+    },
+    {
+      "item": "size",
+      "claim": "4010",
+      "verdict": "FAIL",
+      "detail": "ambiguous: 2 distinct sizes quoted [4010, 4018] - strict rule requires exactly one (real=16000)"
+    },
+    {
+      "item": "arch",
+      "claim": "64-bit",
+      "verdict": "PASS",
+      "detail": "real=64-bit"
+    },
+    {
+      "item": "buildid",
+      "claim": "6ab5d2889899a0522a745015199e6486afa22399",
+      "verdict": "PASS",
+      "detail": "real=6ab5d2889899a0522a745015199e6486afa22399"
+    },
+    {
+      "item": "compiler",
+      "claim": "GCC 13.3.0",
+      "verdict": "PASS",
+      "detail": "real_comment=['13.3.0', '24.04.1', '13.3.0']"
+    },
+    {
+      "item": "packer",
+      "claim": "no verdict claimed",
+      "verdict": "UNVERIFIABLE",
+      "detail": ""
+    },
+    {
+      "item": "strings",
+      "claim": "no census section",
+      "verdict": "UNVERIFIABLE",
+      "detail": ""
+    },
+    {
+      "item": "symbol",
+      "claim": "main",
+      "verdict": "PASS",
+      "detail": "not in symbol tables (33 real syms)"
+    },
+    {
+      "item": "entrypoint",
+      "claim": "0x1080",
+      "verdict": "PASS",
+      "detail": "real=0x1080"
+    },
+    {
+      "item": "template",
+      "claim": "0/8 sections",
+      "verdict": "FAIL",
+      "detail": "missing: File Identity, Compiler/Toolchain, Packer/Protector Verdict, Imports Census, Strings Census, Capabilities Observed, Difficulty Assessment, Final Verdict"
+    },
+    {
+      "item": "contract",
+      "claim": "File Identity",
+      "verdict": "FAIL",
+      "detail": "required report section absent"
+    },
+    {
+      "item": "contract",
+      "claim": "Compiler",
+      "verdict": "FAIL",
+      "detail": "required report section absent"
+    },
+    {
+      "item": "contract",
+      "claim": "Packer",
+      "verdict": "FAIL",
+      "detail": "required report section absent"
+    },
+    {
+      "item": "contract",
+      "claim": "Difficulty",
+      "verdict": "FAIL",
+      "detail": "required report section absent"
+    }
+  ]
+}
