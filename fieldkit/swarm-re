@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+"""SWARM-RE Field Kit CLI — the community entry point.
+
+Subcommands:
+  demo          run the belt1 toy-protector mission end-to-end (body check)
+  map <target>  run a Community MAP mission on any binary (static-only)
+  key check     verify a license key on this machine
+  key show      print this machine's key request fingerprint
+
+Everything is stdlib. Brain = local Ollama if reachable, honest rails if not.
+"""
+import argparse, getpass, hashlib, os, pathlib, socket, sys
+
+HERE = pathlib.Path(__file__).resolve().parent           # kit root (this file lives at top level)
+sys.path.insert(0, str(HERE))
+
+from core import license_key as lk
+from core.brain import Brain
+from core.orchestrator import Mission
+from skills.builtin import SKILLKIT
+
+
+def _activation():
+    key = os.environ.get("SWARMRE_KEY", "")
+    if not key:
+        p = pathlib.Path.home() / ".swarmre" / "key"
+        if p.exists():
+            key = p.read_text().strip()
+    if not key:
+        print("[license] no key — EVALUATION MODE (3-agent cap, watermarked)")
+        print("[license] free key for students/researchers: https://carrionhex.com")
+        return {"eval": True}
+    try:
+        st = lk.require_active(key)
+        print(f"[license] {st.get('tier','community')} tier active"
+              + (f" — {st['days_left']}d left" if "days_left" in st else ""))
+        return {"eval": False, "tier": st.get("tier", "community")}
+    except lk.LicenseError as e:
+        print(f"[license] {e} — EVALUATION MODE")
+        return {"eval": True}
+    except RuntimeError as e:
+        print(f"[license] release key not embedded ({e}) — EVALUATION MODE")
+        return {"eval": True}
+
+
+def cmd_demo(_a):
+    _activation()
+    import subprocess
+    bench = HERE / "bench" / "toy_protector"
+    bench.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["gcc", "-O1", "-o", str(bench / "belt1"), str(bench / "belt1.c")], check=True)
+    brain = Brain()
+    print(f"[demo] brain: ollama model={brain.model or 'UNREACHABLE (rails)'} alive={brain.alive()}")
+    m = Mission(
+        goal="Map the license check of bench/toy_protector/belt1: find the check function, "
+             "name its site, state what input would pass it. Do not modify the binary.",
+        target=str(bench / "belt1"), brain=brain, skills=SKILLKIT)
+    m.run()
+    print(f"\n[verdict] dossier: memory/missions/{m.id}/dossier.md")
+    if m.mech:
+        print(f"[verdict] mechanical gate: {m.mech.get('score', '?')} "
+              f"({m.mech.get('checks', '?')} checks, {m.mech.get('fail', '?')} failed)")
+    print("[demo] mission complete — the gate above is real: it re-ran the tools and "
+          "diffed every claim. On rails (no Ollama) the report is thin and the gate "
+          "correctly scores it down. With a local brain it scores up.")
+
+
+MAP_GOAL = ("MAP the target: file identity, compiler/toolchain, packer verdict, "
+            "imports census, strings census, capabilities observed, difficulty "
+            "assessment, final verdict. Static analysis only — never execute the "
+            "target. Cite only captured evidence; UNKNOWN is safe, invention is fatal.")
+
+
+def cmd_map(a):
+    _activation()
+    t = pathlib.Path(a.target)
+    if not t.exists():
+        sys.exit(f"[map] not found: {t}")
+    brain = Brain()
+    print(f"[map] brain: ollama model={brain.model or 'UNREACHABLE (rails)'} alive={brain.alive()}")
+    m = Mission(goal=MAP_GOAL, target=str(t), brain=brain, skills=SKILLKIT)
+    m.run()
+    print(f"\n[verdict] dossier: memory/missions/{m.id}/dossier.md")
+    if m.mech:
+        print(f"[verdict] mechanical gate: {m.mech.get('score', '?')} "
+              f"({m.mech.get('checks', '?')} checks, {m.mech.get('fail', '?')} failed)")
+
+
+def cmd_key_check(_a):
+    key = os.environ.get("SWARMRE_KEY", "")
+    if not key:
+        p = pathlib.Path.home() / ".swarmre" / "key"
+        key = p.read_text().strip() if p.exists() else ""
+    if not key:
+        sys.exit("[key] no key found — put it in ~/.swarmre/key or $SWARMRE_KEY")
+    try:
+        st = lk.require_active(key)
+        print(f"[key] VALID — tier={st.get('tier')}"
+              + (f" days_left={st['days_left']}" if "days_left" in st else " (no expiry)"))
+    except lk.LicenseError as e:
+        sys.exit(f"[key] INVALID: {e}")
+    except RuntimeError as e:
+        sys.exit(f"[key] cannot verify: {e}")
+
+
+def cmd_key_show(_a):
+    mh = lk.machine_hash().hex()
+    print(f"[key] machine fingerprint: {mh}")
+    print("[key] include this + your academic/affiliation email when requesting a key.")
+
+
+def main():
+    ap = argparse.ArgumentParser(prog="swarm-re", description="SWARM-RE Field Kit")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("demo", help="run the toy-protector demo mission")
+    pm = sub.add_parser("map", help="static MAP mission on a target")
+    pm.add_argument("target")
+    pk = sub.add_parser("key", help="license key tools")
+    pk.add_argument("op", choices=["check", "show"])
+    a = ap.parse_args()
+    if a.cmd == "demo":
+        cmd_demo(a)
+    elif a.cmd == "map":
+        cmd_map(a)
+    else:
+        (cmd_key_check if a.op == "check" else cmd_key_show)(a)
+
+
+if __name__ == "__main__":
+    main()
