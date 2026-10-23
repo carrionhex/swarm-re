@@ -81,11 +81,13 @@ Real runs against the live console — no staging.
 
 **Console storyboard** — stage a specimen, deploy the swarm, ten specialists check in live, plain-English verdict lands:
 
-https://github.com/carrionhex/swarm-re/assets/media/console_story.mp4
+https://carrionhex.github.io/swarm-re/media/console_story.mp4
 
 **Terminal flow** — the same mission from the shell: `curl` the specimen in, poll the run, read the verdict card:
 
-https://github.com/carrionhex/swarm-re/assets/media/demo_flow_terminal.mp4
+https://carrionhex.github.io/swarm-re/media/demo_flow_terminal.mp4
+
+Direct streams (video/mp4). Repo copies: [console_story.mp4](media/console_story.mp4) · [demo_flow_terminal.mp4](media/demo_flow_terminal.mp4)
 
 ## Tiers
 
