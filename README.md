@@ -8,6 +8,12 @@ Manual RE doesn't scale. Campaigns do.
 
 ---
 
+## 🌐 Try it live — no install
+
+**https://dash.carrionhex.com/** — drop any binary (EXE, DLL, ELF, APK), the swarm dissects it with free engines, and you get a plain-English verdict card you can question in the side chat. This repo is the open Field Kit behind it.
+
+---
+
 ## What it does
 
 - **Mission queue** — drop targets in, the swarm plans and executes the campaign
@@ -88,6 +94,8 @@ https://carrionhex.github.io/swarm-re/media/console_story.mp4
 https://carrionhex.github.io/swarm-re/media/demo_flow_terminal.mp4
 
 Direct streams (video/mp4). Repo copies: [console_story.mp4](media/console_story.mp4) · [demo_flow_terminal.mp4](media/demo_flow_terminal.mp4)
+
+Want the same run on your own binary? → https://dash.carrionhex.com/
 
 ## Tiers
 
