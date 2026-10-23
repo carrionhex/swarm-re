@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWARM-RE — AI-Swarm Reverse Engineering</title>
+<meta name="description" content="Drop a binary. A swarm of specialists dissects it. Get a plain-English, evidence-bundled verdict. Free tier live — no install.">
+<style>
+  :root{
+    --bg:#0B0B0C; --panel:#131315; --line:#232320; --panel2:#101012;
+    --bone:#E9E4D8; --dim:#9B968B; --mute:#6B675E;
+    --grn:#7FC96B; --cyan:#6BC7C9; --amb:#E0B34C; --red:#E5484D;
+    --mono:ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--bone);font-family:var(--mono);line-height:1.6;
+       -webkit-font-smoothing:antialiased}
+  a{color:var(--cyan);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* ── nav ── */
+  nav{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,11,12,.92);backdrop-filter:blur(8px);z-index:10}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+  .mark{display:flex;align-items:center;gap:10px;color:var(--bone);font-weight:700;letter-spacing:.5px}
+  .mark:hover{text-decoration:none}
+  .mark .glyph{color:var(--grn)}
+  .navlinks{display:flex;gap:22px;font-size:13px}
+  .navlinks a{color:var(--dim)}
+  .navlinks a:hover{color:var(--bone);text-decoration:none}
+
+  /* ── hero ── */
+  .hero{padding:96px 0 64px;text-align:left;border-bottom:1px solid var(--line);
+        background:radial-gradient(ellipse 700px 340px at 20% -10%, rgba(127,201,107,.06), transparent 70%)}
+  .eyebrow{color:var(--grn);font-size:12px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:18px}
+  h1{font-size:clamp(34px,5.4vw,58px);line-height:1.08;font-weight:800;letter-spacing:-1px;margin-bottom:20px}
+  h1 .accent{color:var(--grn)}
+  .sub{color:var(--dim);font-size:16px;max-width:620px;margin-bottom:34px}
+  .ctas{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;font-family:var(--mono);
+       font-size:14px;font-weight:700;border:1px solid var(--line);cursor:pointer;letter-spacing:.3px}
+  .btn.primary{background:var(--grn);color:#0B0B0C;border-color:var(--grn)}
+  .btn.primary:hover{background:#8fd67b;text-decoration:none}
+  .btn.ghost{color:var(--bone);background:transparent}
+  .btn.ghost:hover{border-color:var(--dim);text-decoration:none}
+  .btn .arr{color:inherit;opacity:.7}
+
+  /* ── sections ── */
+  section{padding:72px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:26px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+  .h2sub{color:var(--mute);font-size:14px;margin-bottom:40px}
+
+  /* ── how ── */
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);padding:26px 22px}
+  .card .num{color:var(--grn);font-size:12px;letter-spacing:2px;margin-bottom:14px}
+  .card h3{font-size:15px;margin-bottom:10px;color:var(--bone)}
+  .card p{font-size:13px;color:var(--dim)}
+  .card code{color:var(--cyan);font-size:12px}
+
+  /* ── videos ── */
+  .videorow{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .vid{background:var(--panel);border:1px solid var(--line)}
+  .vid video{width:100%;display:block;background:#000}
+  .vid .cap{padding:16px 18px;font-size:13px;color:var(--dim)}
+  .cap b{color:var(--bone);display:block;margin-bottom:4px;font-size:13px}
+
+  /* ── tiers ── */
+  .tiergrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .tier{background:var(--panel);border:1px solid var(--line);padding:30px 26px;position:relative}
+  .tier.lab{border-color:rgba(224,179,76,.45)}
+  .tier .tname{font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+  .tier.free .tname{color:var(--grn)}
+  .tier.lab .tname{color:var(--amb)}
+  .tier .price{font-size:34px;font-weight:800;margin-bottom:20px}
+  .tier .price span{font-size:13px;color:var(--mute);font-weight:400}
+  .tier ul{list-style:none;font-size:13px;color:var(--dim)}
+  .tier li{padding:7px 0 7px 22px;border-bottom:1px solid var(--panel2);position:relative}
+  .tier li:last-child{border-bottom:none}
+  .tier li::before{content:"▸";position:absolute;left:0;color:var(--grn)}
+  .tier.lab li::before{color:var(--amb)}
+  .tier .badge{position:absolute;top:-11px;right:18px;background:var(--amb);color:#0B0B0C;
+               font-size:10px;font-weight:800;letter-spacing:1.5px;padding:4px 10px}
+
+  /* ── strip ── */
+  .strip{display:flex;flex-wrap:wrap;gap:36px;justify-content:space-between}
+  .strip div{font-size:13px;color:var(--dim)}
+  .strip b{display:block;font-size:22px;color:var(--bone);font-weight:800;margin-bottom:2px}
+
+  footer{padding:36px 0 48px;color:var(--mute);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--mute)}
+  footer a:hover{color:var(--dim)}
+
+  @media(max-width:820px){
+    .grid3,.videorow,.tiergrid{grid-template-columns:1fr}
+    .hero{padding:64px 0 48px}
+    .navlinks{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="mark" href="#"><span class="glyph">⬡</span> SWARM-RE</a>
+  <div class="navlinks">
+    <a href="#how">How it works</a>
+    <a href="#watch">Watch it work</a>
+    <a href="#tiers">Free vs Lab</a>
+    <a href="https://dash.carrionhex.com/">Console ↗</a>
+  </div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">⬡ CarrionHex · launch v1.0.0</div>
+  <h1>Drop a binary.<br><span class="accent">A swarm dissects it.</span></h1>
+  <p class="sub">SWARM-RE turns reverse-engineering missions into coordinated multi-agent campaigns — specialists triage, decompile, trace and cross-examine, then a Master agent testifies in plain English. Every claim lands in a sha256-stamped evidence bundle you can replay, diff, and audit.</p>
+  <div class="ctas">
+    <a class="btn primary" href="https://dash.carrionhex.com/">Try it live — no install <span class="arr">→</span></a>
+    <a class="btn ghost" href="https://github.com/carrionhex/swarm-re">GitHub repo <span class="arr">↗</span></a>
+  </div>
+</div></header>
+
+<section id="how"><div class="wrap">
+  <h2>How it works</h2>
+  <p class="h2sub">Three moves. The swarm does the rest.</p>
+  <div class="grid3">
+    <div class="card"><div class="num">01</div><h3>Stage the specimen</h3><p>Drop any binary — EXE, DLL, ELF, APK — into the console or straight over <code>curl</code>. Nothing to install, no account, 16MB cap.</p></div>
+    <div class="card"><div class="num">02</div><h3>The swarm works</h3><p>Mapper, identity, strings, tracer, and the deep engines check in live. The Master cross-examines every specialist claim before it counts.</p></div>
+    <div class="card"><div class="num">03</div><h3>Verdict card</h3><p>Plain-English verdict: what the file is, what it does, what it hides — every statement backed by a replayable evidence bundle.</p></div>
+  </div>
+</div></section>
+
+<section id="watch"><div class="wrap">
+  <h2>Watch it work</h2>
+  <p class="h2sub">Real runs against the live console — no staging.</p>
+  <div class="videorow">
+    <div class="vid">
+      <video src="media/console_story.mp4" controls preload="metadata" playsinline></video>
+      <div class="cap"><b>Console storyboard — 16s</b>Stage a specimen, deploy the swarm, ten specialists check in live, the verdict lands.</div>
+    </div>
+    <div class="vid">
+      <video src="media/demo_flow_terminal.mp4" controls preload="metadata" playsinline></video>
+      <div class="cap"><b>Terminal flow — 74s</b>The same mission from the shell: <code>curl</code> the specimen in, poll the run, read the verdict card.</div>
+    </div>
+  </div>
+</div></section>
+
+<section id="tiers"><div class="wrap">
+  <h2>Free vs Lab</h2>
+  <p class="h2sub">Start free. Upgrade when you need the deep engines.</p>
+  <div class="tiergrid">
+    <div class="tier free">
+      <div class="tname">Community</div>
+      <div class="price">$0 <span>— forever</span></div>
+      <ul>
+        <li>Live console — drop a binary, get a verdict card</li>
+        <li>Two free engines: Ghidra Warden + Trace Reaper</li>
+        <li>Side chat with the Master agent</li>
+        <li>Open Field Kit — full orchestrator + bench corpus, runs local</li>
+        <li>Evidence bundles, sha256-stamped, replayable</li>
+      </ul>
+    </div>
+    <div class="tier lab">
+      <div class="badge">DEEP ENGINES</div>
+      <div class="tname">Lab</div>
+      <div class="price">Paid <span>— unlocks at scale</span></div>
+      <ul>
+        <li>Everything in Community</li>
+        <li>Deep tool adapters — plug in engines you license</li>
+        <li>Campaign mode — queues, diffs, cross-mission recall</li>
+        <li>Priority lane — bigger specimens, longer runs</li>
+        <li>Offline license — your bench, your air-gapped lab</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="strip">
+    <div><b>10</b>specialists per swarm</div>
+    <div><b>2</b>free engines, live today</div>
+    <div><b>16MB</b>specimen cap, fair-rate</div>
+    <div><b>100%</b>claims evidence-stamped</div>
+  </div>
+</div></section>
+
+<footer><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;width:100%">
+  <div>© 2026 CarrionHex · SWARM-RE · BSL 1.1 → Apache-2.0 at 2030-10-08</div>
+  <div><a href="https://github.com/carrionhex/swarm-re">GitHub</a> · <a href="https://dash.carrionhex.com/">Console</a> · <a href="https://github.com/carrionhex/swarm-re/blob/main/EULA.md">EULA</a></div>
+</div></footer>
+
+</body>
+</html>
