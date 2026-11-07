@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://carrionhex.com/schemas/chx-lift-funcs-1.json",
+  "title": "CHX-LIFT function dump — schema v1",
+  "description": "Contract for DumpFuncs.java (Ghidra 12.2 postScript) output. Strict: any deviation means quarantine, never ingest. Producer is deterministic; drift = corruption, not style.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["name", "addr", "bytes", "sig", "body"],
+    "additionalProperties": false,
+    "properties": {
+      "name":  { "type": "string", "minLength": 1, "description": "function name as recovered (mangled ok — enrich lane renames later)" },
+      "addr":  { "type": "integer", "minimum": 0, "description": "entry-point virtual address (image base relative offset)" },
+      "bytes": { "type": "integer", "minimum": 0, "description": "function body size in addressable units" },
+      "sig":   { "type": "string", "description": "Ghidra signature string, may be empty" },
+      "body":  { "type": "string", "description": "pseudo-C decompilation; empty when decompile failed (timeout/guards)" }
+    }
+  }
+}

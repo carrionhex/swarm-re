@@ -103,6 +103,23 @@ Direct streams (video/mp4). Repo copies: [journey.mp4](media/journey.mp4) · [co
 
 Want the same run on your own binary? → https://dash.carrionhex.com/
 
+## Why distributed beats single-seat
+
+Most AI reverse-engineering tools operate as single-host subshell wrappers: an LLM invokes CLI binaries sequentially, screenscrapes terminal stdout, and loses all context when the session terminates.
+
+**SWARM-RE** treats reverse engineering as a distributed, stateful pipeline:
+
+| Capability | Single-Seat Agent Scripts | SWARM-RE Distributed Pipeline |
+| :--- | :--- | :--- |
+| **Execution Topology** | Single host (local CLI subshells) | Distributed Engine (dedicated compute, orchestrator & edge nodes) |
+| **Analysis Concurrency** | Serial / turn-based tool invocation | Concurrent multi-lane DAG (decompile, triage, dynamic carve in parallel) |
+| **State & Memory** | Transient (session-scoped context) | Centralized content-addressable storage + global symbol cache |
+| **Host Impact** | Swamps the developer host during heavy lifting | Heavy decompilation & symbolic execution offloaded to compute workers |
+| **Tool Orchestration** | Brittle stdout screen-scraping / regex | Unified intermediate representation (IR) & structured graph schemas |
+| **Deduplication** | Re-analyzes common libraries every run | `has()`-first storage law — analyze once, enrich globally across all specimens |
+
+Field-proven: six analysis lanes (triage swarm, static disasm, overlay carver, CAS dedup, headless decompiler, job queue) have run simultaneously on one specimen across two machines — identical SHA-256 at every seat, zero conflicts.
+
 ## Tiers
 
 | | **Community** | **Lab** |

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-# chx_liftd_tick.py — chx-lift0 dumb headless consumer (v0.2)
+# chx_liftd_tick.py — chx-lift0 dumb headless consumer (v0.3)
+# v0.3: IR schema gate — funcs.json must pass lift_validate.py before it
+# touches the CAS. Drift = quarantine + verdict, never ingest. Also fixed
+# f-string host interpolation on the scp targets.
 # Remote python scripts run via stdin heredoc (ssh ["python3","-"]) —
 # NEVER via -c with a long string (ssh argv join eats the quoting).
 import subprocess, sys, os, json, shutil
@@ -77,7 +80,7 @@ def main():
         return 0
     # 2. pull blob
     local_bin = os.path.join(WORK, sha + ".bin")
-    r = subprocess.run(SCP_BASE + [f"_CAS_HOST:{src}", local_bin],
+    r = subprocess.run(SCP_BASE + [f"{_CAS_HOST}:{src}", local_bin],
                        capture_output=True, text=True, timeout=600)
     if r.returncode != 0 or not os.path.isfile(local_bin):
         print("PULL_FAIL", (r.stderr or "")[-300:]); return 1
@@ -96,14 +99,35 @@ def main():
     log_tail = ((r.stdout or "") + (r.stderr or ""))[-400:]
     if not os.path.isfile(funcs_out):
         print("GHIDRA_FAIL", log_tail); return 1
-    try:
-        nfuncs = len(json.load(open(funcs_out)))
-    except Exception:
-        nfuncs = -1
+    # 3.5 IR schema gate — strict contract, quarantine on drift
+    validator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lift_validate.py")
+    if os.path.isfile(validator):
+        v = subprocess.run([sys.executable, validator, funcs_out],
+                           capture_output=True, text=True, timeout=120)
+        vout = (v.stdout or "").strip()
+        if v.returncode != 0:
+            qdir = os.path.join(outdir, "quarantine")
+            os.makedirs(qdir, exist_ok=True)
+            qpath = os.path.join(qdir, f"funcs.bad.{sha[:16]}.{int(__import__('time').time())}.json")
+            shutil.copy2(funcs_out, qpath)
+            first_errs = " | ".join(vout.splitlines()[1:4])
+            remote_mark({"artifact_id": aid,
+                         "summary": f"schema_fail v1: {first_errs[:220]} (quarantined)"})
+            print(f"SCHEMA_FAIL aid={aid} quarantined -> {qpath}", flush=True)
+            shutil.rmtree(proj, ignore_errors=True)
+            os.remove(local_bin)
+            return 1
+        nfuncs = int(vout.split("funcs=")[1].split()[0]) if "funcs=" in vout else -1
+        print(f"SCHEMA_OK {vout.splitlines()[0]}", flush=True)
+    else:
+        try:
+            nfuncs = len(json.load(open(funcs_out)))
+        except Exception:
+            nfuncs = -1
     # 4. push JSON back
     remote_dir = CAS + "/decompiled"
     subprocess.run(GATE + ["mkdir", "-p", remote_dir], capture_output=True, timeout=60)
-    r = subprocess.run(SCP_BASE + [funcs_out, f"_CAS_HOST:{remote_dir}/{sha}.json"],
+    r = subprocess.run(SCP_BASE + [funcs_out, f"{_CAS_HOST}:{remote_dir}/{sha}.json"],
                        capture_output=True, text=True, timeout=600)
     if r.returncode != 0:
         print("PUSH_FAIL", (r.stderr or "")[-300:]); return 1
