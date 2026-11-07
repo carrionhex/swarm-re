@@ -87,6 +87,10 @@ of truth for what's next.
 
 Real runs against the live console — no staging. Try your own specimen at **https://dash.carrionhex.com** any time.
 
+**The full journey** — one uncut 37-second take: landing → open console → specimen dropped → deploy swarm → ten specialists grind live with receipts → verdict card. Recorded with the repo's own [recorder stack](ops/recorder/):
+
+https://carrionhex.github.io/swarm-re/media/journey.mp4
+
 **Console storyboard** — stage a specimen, deploy the swarm, ten specialists check in live, plain-English verdict lands:
 
 https://carrionhex.github.io/swarm-re/media/console_story.mp4
@@ -95,7 +99,7 @@ https://carrionhex.github.io/swarm-re/media/console_story.mp4
 
 https://carrionhex.github.io/swarm-re/media/demo_flow_terminal.mp4
 
-Direct streams (video/mp4). Repo copies: [console_story.mp4](media/console_story.mp4) · [demo_flow_terminal.mp4](media/demo_flow_terminal.mp4)
+Direct streams (video/mp4). Repo copies: [journey.mp4](media/journey.mp4) · [console_story.mp4](media/console_story.mp4) · [demo_flow_terminal.mp4](media/demo_flow_terminal.mp4)
 
 Want the same run on your own binary? → https://dash.carrionhex.com/
 
@@ -124,6 +128,10 @@ Business Source License 1.1 — free to use, modify, and redistribute; competing
 ## Status
 
 Actively developed. Roadmap and issue tracker are the source of truth. Contributions welcome — see [CONTRIBUTING](CONTRIBUTING.md).
+
+**Live topology:** https://dash.carrionhex.com/map/ — the bench, its workers, and the storage bridge, breathing in real time.  
+**Milestones:** [docs/MILESTONES.md](docs/MILESTONES.md) — what the live bench has shipped and the scars it paid for each one.  
+**Ops kit:** [ops/](ops/) — storage bridge, lift lane, enrich lane, map feed, and the demo recorder, env-driven and ready to point at your own bench.
 
 ---
 

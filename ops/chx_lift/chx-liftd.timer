@@ -1,0 +1,11 @@
+[Unit]
+Description=chx-lift0 liftd timer — eats the CAS-side lift queue
+
+[Timer]
+OnBootSec=120
+OnUnitActiveSec=300
+RandomizedDelaySec=60
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=chx-lift0 CarrionHex headless lift consumer tick
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/chx/chx_liftd_tick.py
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=2400
